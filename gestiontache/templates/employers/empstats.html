@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if user.is_authenticated and user.is_staff and user.is_superuser %}
+
+    <br><br>
+    <h2>Les statistiques des Employers</h2>
+    <hr>
+    <br><br>
+
+    <table>
+      <tr>
+        <td>
+          <div class="chart-container">
+            <canvas id="lineChart"></canvas>
+          </div>
+        </td>
+        <td>
+          <div class="chart-container">
+            <canvas id="pieChart1"></canvas>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <div class="chart-container">
+            <canvas id="barChart1"></canvas>
+          </div>
+        </td>
+        <td>
+          <div class="chart-container">
+            <canvas id="barChart2"></canvas>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .chart-container {
+        width: 490px;
+        height: 390px;
+        margin-bottom: 20px;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      td {
+        padding: 10px;
+        text-align: center;
+      }
+
+      @media (max-width: 768px) {
+        .chart-container {
+          width: 100%;
+        }
+      }
+
+      h2 {
+        padding-left: 15px;
+        font-weight: bold;
+      }
+    </style>
+
+    <script>
+      // Line chart
+      const lineCtx = document.getElementById('lineChart').getContext('2d');
+      new Chart(lineCtx, {
+        type: 'line',
+        data: {
+          labels: [{% for donnee in donné %}'{{ donnee.nom }}',{% endfor %}],
+          datasets: [{
+            label: 'Nombre des Taches',
+            data: [{% for donnee in donné %}{{ donnee.nbr_taches }},{% endfor %}],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgb(255, 99, 132)',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+
+      // Pie chart 1
+      const pieCtx1 = document.getElementById('pieChart1').getContext('2d');
+      new Chart(pieCtx1, {
+        type: 'pie',
+        data: {
+          labels: [{% for siege in siege_list %}'{{ siege }}',{% endfor %}],
+          datasets: [{
+            label: 'Nombre employers',
+            data: [{% for nombre in nomb_siege_list %}{{ nombre }},{% endfor %}],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+
+      // Bar chart 1
+      const barCtx1 = document.getElementById('barChart1').getContext('2d');
+      new Chart(barCtx1, {
+        type: 'bar',
+        data: {
+          labels: [{% for donnee in donné %}'{{ donnee.nom }}',{% endfor %}],
+          datasets: [{
+            label: 'Salaire',
+            data: [{% for donnee in donné %}{{ donnee.salair }},{% endfor %}],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgb(54, 162, 235)',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+
+      // Bar chart 2
+      const barCtx2 = document.getElementById('barChart2').getContext('2d');
+      new Chart(barCtx2, {
+        type: 'bar',
+        data: {
+          labels: [{% for spec in special_list %}'{{ spec }}',{% endfor %}],
+          datasets: [{
+            label: 'Nombre employers',
+            data: [{% for nomb in nomb_spec_list %}{{ nomb }},{% endfor %}],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true
+        }
+      });
+    </script>
+  {% else %}
+    <h3>Vous n'êtes pas autorisé pour voir cette page</h3>
+  {% endif %}
+{% endblock %}
